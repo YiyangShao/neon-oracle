@@ -3,8 +3,13 @@
 import type { DrawnCard } from "@/lib/tarot";
 import type { Accent } from "@/lib/theme";
 
-// Card face — striped placeholder + monospace illustration tag.
-// Real illustrations slot in by replacing the inner stripe panel.
+// Card face — the canonical Rider-Waite-Smith 1909 art fills the entire face.
+// The image already carries the Roman numeral (top) and English name (bottom),
+// so we don't repeat those inside the frame. Surrounding context strips
+// (DealScreen caption, OracleScreen position label) handle the Chinese name.
+//
+// Outer frame keeps the gold border + shadow + glow that anchor the card
+// in the deep-ink theme.
 export function CardFace({
   card,
   w = 180,
@@ -19,110 +24,47 @@ export function CardFace({
   accent: Accent;
 }) {
   const ratio = w / 180;
+  const radius = 6 * ratio;
   return (
     <div
       style={{
         width: w,
         height: h,
-        borderRadius: 6 * ratio,
-        background: "linear-gradient(180deg, #1a1815 0%, #100e0c 100%)",
+        borderRadius: radius,
+        background: "#0c0a08",
         border: `1px solid ${accent.dim}`,
         boxShadow: `0 16px 40px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(243,235,216,0.04), 0 0 24px ${accent.glow}`,
-        display: "flex",
-        flexDirection: "column",
-        padding: 10 * ratio,
         position: "relative",
         overflow: "hidden",
         transform: reversed ? "rotate(180deg)" : "none",
         transition: "transform 0.4s",
-        fontFamily: "var(--font-serif)",
-        color: "var(--bone)",
       }}
     >
-      <div
+      {/* Plain <img>: simpler than next/image for our inline-style world,
+          and the image is already pre-sized to a sane resolution. */}
+      <img
+        src={card.imageSrc}
+        alt={`${card.cn} · ${card.en}`}
+        draggable={false}
         style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 9 * ratio,
-          letterSpacing: "0.18em",
-          color: accent.fg,
-          opacity: 0.85,
-          textAlign: "center",
-          lineHeight: 1,
-        }}
-      >
-        {card.n}
-      </div>
-
-      <div
-        style={{
-          height: 1,
-          background: accent.dim,
-          margin: `${5 * ratio}px ${20 * ratio}px ${10 * ratio}px`,
+          display: "block",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          // The RWS scans are warm-cream paper; ease them toward the ink
+          // background without losing recognizability.
+          filter: "brightness(0.92) contrast(1.05) saturate(0.92)",
         }}
       />
-
+      {/* Subtle inner vignette to tie the bright RWS art to the dark frame. */}
       <div
         style={{
-          flex: 1,
-          background: `repeating-linear-gradient(135deg, transparent 0 ${4 * ratio}px, ${accent.dim} ${4 * ratio}px ${4.5 * ratio}px)`,
-          border: `1px dashed ${accent.dim}`,
-          borderRadius: 3 * ratio,
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: 8 * ratio,
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          boxShadow: `inset 0 0 ${28 * ratio}px rgba(12,10,8,0.55)`,
         }}
-      >
-        <div
-          style={{
-            fontSize: 36 * ratio,
-            color: accent.fg,
-            opacity: 0.9,
-            textShadow: `0 0 12px ${accent.glow}`,
-            lineHeight: 1,
-          }}
-        >
-          {card.glyph}
-        </div>
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 7 * ratio,
-            color: "var(--bone)",
-            opacity: 0.35,
-            letterSpacing: "0.1em",
-          }}
-        >
-          {`<illustration:${card.en.toLowerCase().replace(/\s+/g, "_")}>`}
-        </div>
-      </div>
-
-      <div
-        style={{
-          textAlign: "center",
-          marginTop: 9 * ratio,
-          fontSize: 13 * ratio,
-          letterSpacing: "0.2em",
-          color: "var(--bone)",
-        }}
-      >
-        {card.cn}
-      </div>
-      <div
-        style={{
-          textAlign: "center",
-          fontFamily: "var(--font-mono)",
-          fontSize: 7 * ratio,
-          letterSpacing: "0.18em",
-          color: "var(--mute)",
-          marginTop: 2 * ratio,
-          textTransform: "uppercase",
-        }}
-      >
-        {card.en}
-      </div>
+      />
     </div>
   );
 }

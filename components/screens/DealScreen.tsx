@@ -82,6 +82,10 @@ export function DealScreen({
 
   const headerFs = tokens.cardW >= 200 ? 12 : 10;
   const dealLift = Math.max(260, ch * 0.85);
+  // Sizing of the per-card caption that appears under each card after flip.
+  const nameTopOffset = tokens.cardW >= 200 ? 22 : 14;
+  const nameFs = tokens.cardW >= 200 ? 18 : 12;
+  const nameSubFs = tokens.cardW >= 200 ? 9 : 7;
 
   return (
     <div
@@ -123,6 +127,9 @@ export function DealScreen({
           const dealing = stage === "dealing";
           const dealOffset = dealing ? -dealLift : pos.y;
           const dealOpacity = dealing ? 0 : 1;
+          // Caption appears once this card has flipped, so the Chinese name
+          // arrives as a quiet confirmation of what the user is seeing.
+          const captionVisible = flipped[i];
           return (
             <div
               key={i}
@@ -152,6 +159,46 @@ export function DealScreen({
                   />
                 }
               />
+              {/* Chinese name caption — fades in once the card has flipped */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: ch + nameTopOffset,
+                  left: 0,
+                  right: 0,
+                  textAlign: "center",
+                  opacity: captionVisible ? 1 : 0,
+                  transform: captionVisible ? "translateY(0)" : "translateY(-4px)",
+                  transition: "opacity 600ms ease-out 200ms, transform 600ms ease-out 200ms",
+                  pointerEvents: "none",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontSize: nameFs,
+                    color: "var(--bone)",
+                    letterSpacing: "0.32em",
+                    textIndent: "0.32em",
+                  }}
+                >
+                  {card.cn}
+                </div>
+                <div
+                  style={{
+                    marginTop: 4,
+                    fontFamily: "var(--font-mono)",
+                    fontSize: nameSubFs,
+                    color: accent.fg,
+                    letterSpacing: "0.25em",
+                    textTransform: "uppercase",
+                    opacity: 0.75,
+                  }}
+                >
+                  {card.n}
+                  {card.reversed && " · reversed"}
+                </div>
+              </div>
             </div>
           );
         })}

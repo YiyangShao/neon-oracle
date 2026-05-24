@@ -73,13 +73,12 @@ https://your-domain/r/<编码后的 payload>
 
 `OPENAI_API_KEY` 缺失、调用失败、或返回无法解析的格式时，`/api/divine` 会回落到 `lib/scripted.ts` 里的 3 套预写脚本。前端有一个角落的 `scripted` 小标记，但功能上无感知差异。
 
-## 牌面美术
-
-当前 22 张牌使用条纹 placeholder + 等宽 `<illustration:the_tower>` 标注，方便看见接入位。
-真实插画接入时替换 `components/primitives/CardFace.tsx` 中间的占位区即可。
-
 ## 致谢
 
 - 视觉与交互原型由 Claude Design 产出
 - 工程实现由 Claude Code 完成
 - 产品方向、决策、push button 由 Yiyang Shao
+
+## 卡面致谢
+
+22 张大阿尔卡那卡面采用 **Rider-Waite-Smith 1909 版本**，扫描源自 [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:Rider-Waite-Smith_tarot_deck)，该版本因发表已逾百年，进入公共领域。
