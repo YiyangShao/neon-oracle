@@ -60,9 +60,10 @@ export function ShareScreen({
   };
 
   const desktopScale = tokens.cardW >= 200;
-  // The mini cards inside the share card itself.
+  // The mini cards inside the share card itself — same 1.73 aspect as the
+  // big cards so the RWS art shows complete.
   const innerCardW = desktopScale ? 110 : 62;
-  const innerCardH = desktopScale ? 174 : 98;
+  const innerCardH = Math.round(innerCardW * 1.73); // 190 / 107
   const cardPadV = desktopScale ? 36 : 22;
   const cardPadH = desktopScale ? 32 : 18;
   const cardHeaderFs = desktopScale ? 10 : 8;

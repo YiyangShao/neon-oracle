@@ -41,7 +41,11 @@ export function CardFace({
       }}
     >
       {/* Plain <img>: simpler than next/image for our inline-style world,
-          and the image is already pre-sized to a sane resolution. */}
+          and the image is already pre-sized to a sane resolution.
+          object-fit: contain so the full RWS art is always visible — the
+          card aspect matches the dominant 1.73 ratio, so any minor
+          letterboxing on differently-proportioned scans disappears into
+          the ink background. */}
       <img
         src={card.imageSrc}
         alt={`${card.cn} · ${card.en}`}
@@ -50,7 +54,7 @@ export function CardFace({
           display: "block",
           width: "100%",
           height: "100%",
-          objectFit: "cover",
+          objectFit: "contain",
           // The RWS scans are warm-cream paper; ease them toward the ink
           // background without losing recognizability.
           filter: "brightness(0.92) contrast(1.05) saturate(0.92)",

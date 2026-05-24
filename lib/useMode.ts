@@ -51,12 +51,18 @@ export type SizeTokens = {
   shareCardMaxW: number;
 };
 
+// Card aspect ratio = RWS source (~600 × 1038, H/W ≈ 1.73).
+// We standardize on this so the image fills the card with no cropping.
+// Cards whose native scan is slightly less tall (e.g. The Fool ~1.68) get
+// a tiny letterbox that's invisible against the ink background.
+const CARD_ASPECT = 1.73;
+
 export const SIZES: Record<Mode, SizeTokens> = {
   mobile: {
     cardW: 96,
-    cardH: 152,
+    cardH: Math.round(96 * CARD_ASPECT),   // 166
     miniW: 56,
-    miniH: 88,
+    miniH: Math.round(56 * CARD_ASPECT),   // 97
     cardGap: 16,
     titleSerifBig: 26,
     titleSerifMid: 22,
@@ -73,9 +79,9 @@ export const SIZES: Record<Mode, SizeTokens> = {
   desktop: {
     // Cards meaningfully larger — the deal phase finally has weight.
     cardW: 260,
-    cardH: 410,
+    cardH: Math.round(260 * CARD_ASPECT),  // 450
     miniW: 110,
-    miniH: 174,
+    miniH: Math.round(110 * CARD_ASPECT),  // 190
     cardGap: 64,
     titleSerifBig: 42,
     titleSerifMid: 34,
