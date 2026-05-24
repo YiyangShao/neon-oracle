@@ -5,6 +5,7 @@ import { Starfield } from "@/components/primitives/Starfield";
 import { CardFace } from "@/components/primitives/CardFace";
 import type { DrawnCard } from "@/lib/tarot";
 import type { Accent } from "@/lib/theme";
+import type { SizeTokens } from "@/lib/useMode";
 
 const POSITION_LABELS = ["I · 过 去", "II · 此 刻", "III · 将 至"];
 
@@ -16,6 +17,7 @@ export function OracleScreen({
   question,
   onContinue,
   accent,
+  tokens,
   revealSpeed = 1,
   live,
 }: {
@@ -24,6 +26,7 @@ export function OracleScreen({
   question: string;
   onContinue: () => void;
   accent: Accent;
+  tokens: SizeTokens;
   revealSpeed?: number;
   live: boolean;
 }) {
@@ -32,7 +35,6 @@ export function OracleScreen({
   const [done, setDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Per-char scheduler. Punctuation gets a longer pause — breath rhythm.
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const cur = activeIdx;
@@ -71,6 +73,10 @@ export function OracleScreen({
     setDone(true);
   };
 
+  const labelFs = tokens.cardW >= 200 ? 11 : 9;
+  const questionFs = tokens.oracleBodyFs - 2;
+  const positionLabelFs = tokens.cardW >= 200 ? 11 : 9;
+
   return (
     <div
       style={{
@@ -78,7 +84,7 @@ export function OracleScreen({
         inset: 0,
         display: "flex",
         flexDirection: "column",
-        padding: "60px 24px 24px",
+        padding: `${tokens.stagePadTop * 0.85}px ${tokens.stagePadX}px ${tokens.stagePadX}px`,
       }}
     >
       <Starfield density={0.4} opacity={0.3} />
@@ -88,8 +94,8 @@ export function OracleScreen({
         style={{
           display: "flex",
           justifyContent: "center",
-          gap: 10,
-          marginBottom: 18,
+          gap: tokens.cardGap * 0.5,
+          marginBottom: 22,
         }}
       >
         {cards.map((c, i) => (
@@ -102,8 +108,8 @@ export function OracleScreen({
           >
             <CardFace
               card={c}
-              w={56}
-              h={88}
+              w={tokens.miniW}
+              h={tokens.miniH}
               reversed={c.reversed}
               accent={accent}
             />
@@ -116,7 +122,7 @@ export function OracleScreen({
           style={{
             textAlign: "center",
             fontFamily: "var(--font-mono)",
-            fontSize: 9,
+            fontSize: labelFs,
             color: "var(--mute)",
             letterSpacing: "0.2em",
             textTransform: "uppercase",
@@ -132,11 +138,11 @@ export function OracleScreen({
           style={{
             textAlign: "center",
             fontFamily: "var(--font-serif)",
-            fontSize: 13,
+            fontSize: questionFs,
             color: "var(--bone)",
             opacity: 0.6,
             fontStyle: "italic",
-            marginBottom: 18,
+            marginBottom: 22,
             padding: "0 24px",
           }}
         >
@@ -144,7 +150,7 @@ export function OracleScreen({
         </div>
       )}
 
-      {/* Oracle text */}
+      {/* Oracle text — bounded by a max line measure so reading rhythm holds on wide screens */}
       <div
         ref={scrollRef}
         onClick={skip}
@@ -153,6 +159,9 @@ export function OracleScreen({
           overflowY: "auto",
           padding: "8px 4px",
           cursor: done ? "default" : "pointer",
+          width: "100%",
+          maxWidth: tokens.oracleBodyMaxW,
+          margin: "0 auto",
         }}
       >
         {sections.map((s, i) => {
@@ -162,7 +171,7 @@ export function OracleScreen({
             <div
               key={i}
               style={{
-                marginBottom: 22,
+                marginBottom: 28,
                 opacity: i <= activeIdx ? 1 : 0,
                 animation: i <= activeIdx ? "oracle-fade-in 0.7s ease-out" : "none",
               }}
@@ -170,11 +179,11 @@ export function OracleScreen({
               <div
                 style={{
                   fontFamily: "var(--font-mono)",
-                  fontSize: 9,
+                  fontSize: positionLabelFs,
                   color: accent.fg,
                   letterSpacing: "0.3em",
                   textTransform: "uppercase",
-                  marginBottom: 8,
+                  marginBottom: 10,
                   opacity: 0.85,
                 }}
               >
@@ -183,7 +192,7 @@ export function OracleScreen({
               <div
                 style={{
                   fontFamily: "var(--font-serif)",
-                  fontSize: 17,
+                  fontSize: tokens.oracleBodyFs,
                   lineHeight: 1.85,
                   color: "var(--bone)",
                   letterSpacing: "0.04em",
@@ -211,7 +220,7 @@ export function OracleScreen({
       </div>
 
       {/* Bottom control */}
-      <div style={{ textAlign: "center", paddingTop: 16, minHeight: 60 }}>
+      <div style={{ textAlign: "center", paddingTop: 20, minHeight: 60 }}>
         {done ? (
           <button
             onClick={onContinue}
@@ -219,9 +228,9 @@ export function OracleScreen({
               background: accent.fg,
               color: "#0c0a08",
               border: "none",
-              padding: "12px 36px",
+              padding: `${tokens.buttonPadV - 2}px ${tokens.buttonPadH - 8}px`,
               fontFamily: "var(--font-serif)",
-              fontSize: 14,
+              fontSize: tokens.buttonFs - 2,
               letterSpacing: "0.36em",
               cursor: "pointer",
               textIndent: "0.36em",

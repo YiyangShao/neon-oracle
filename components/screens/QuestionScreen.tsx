@@ -3,14 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Starfield } from "@/components/primitives/Starfield";
 import type { Accent } from "@/lib/theme";
+import type { SizeTokens } from "@/lib/useMode";
 
 // 2. Question — write or skip. Centered, no labels, no chrome.
 export function QuestionScreen({
   onCommit,
   accent,
+  tokens,
 }: {
   onCommit: (q: string) => void;
   accent: Accent;
+  tokens: SizeTokens;
 }) {
   const [value, setValue] = useState("");
   const taRef = useRef<HTMLTextAreaElement>(null);
@@ -20,6 +23,11 @@ export function QuestionScreen({
   }, []);
 
   const commit = (q: string) => onCommit(q.trim());
+  const label = tokens.titleSerifBig >= 36 ? 13 : 10;
+  const titleFs = tokens.titleSerifBig + 6;
+  const taFs = tokens.oracleBodyFs + 2;
+  const counterFs = tokens.titleSerifMid >= 30 ? 11 : 9;
+  const skipFs = tokens.titleSerifMid >= 30 ? 12 : 10;
 
   return (
     <div
@@ -28,7 +36,7 @@ export function QuestionScreen({
         inset: 0,
         display: "flex",
         flexDirection: "column",
-        padding: "72px 28px 36px",
+        padding: `${tokens.stagePadTop}px ${tokens.stagePadX}px ${tokens.stagePadX * 1.4}px`,
         animation: "oracle-fade-in 0.9s ease-out",
       }}
     >
@@ -37,12 +45,12 @@ export function QuestionScreen({
       <div
         style={{
           fontFamily: "var(--font-mono)",
-          fontSize: 10,
+          fontSize: label,
           letterSpacing: "0.3em",
           color: accent.fg,
           textTransform: "uppercase",
           textAlign: "center",
-          marginBottom: 18,
+          marginBottom: 22,
         }}
       >
         — 把心事写下 —
@@ -51,12 +59,12 @@ export function QuestionScreen({
       <div
         style={{
           fontFamily: "var(--font-serif)",
-          fontSize: 26,
+          fontSize: titleFs,
           color: "var(--bone)",
           letterSpacing: "0.05em",
           lineHeight: 1.5,
           textAlign: "center",
-          marginBottom: 36,
+          marginBottom: 44,
         }}
       >
         你想问什么？
@@ -68,6 +76,7 @@ export function QuestionScreen({
           position: "relative",
           display: "flex",
           flexDirection: "column",
+          alignItems: "center",
         }}
       >
         <textarea
@@ -82,12 +91,13 @@ export function QuestionScreen({
             outline: "none",
             color: "var(--bone)",
             fontFamily: "var(--font-serif)",
-            fontSize: 18,
+            fontSize: taFs,
             lineHeight: 1.7,
             letterSpacing: "0.02em",
             textAlign: "center",
             resize: "none",
             width: "100%",
+            maxWidth: tokens.oracleBodyMaxW,
             padding: "8px 0",
             caretColor: accent.fg,
           }}
@@ -98,6 +108,7 @@ export function QuestionScreen({
             background: accent.dim,
             opacity: 0.6,
             width: "60%",
+            maxWidth: 420,
             margin: "0 auto",
           }}
         />
@@ -106,7 +117,7 @@ export function QuestionScreen({
             marginTop: 10,
             textAlign: "center",
             fontFamily: "var(--font-mono)",
-            fontSize: 9,
+            fontSize: counterFs,
             color: "var(--mute)",
             letterSpacing: "0.2em",
           }}
@@ -120,8 +131,8 @@ export function QuestionScreen({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 18,
-          marginTop: 24,
+          gap: 22,
+          marginTop: 28,
         }}
       >
         <button
@@ -130,9 +141,9 @@ export function QuestionScreen({
             background: value.trim() ? accent.fg : "transparent",
             color: value.trim() ? "#0c0a08" : "var(--mute)",
             border: `1px solid ${value.trim() ? accent.fg : accent.dim}`,
-            padding: "14px 56px",
+            padding: `${tokens.buttonPadV}px ${tokens.buttonPadH}px`,
             fontFamily: "var(--font-serif)",
-            fontSize: 16,
+            fontSize: tokens.buttonFs,
             letterSpacing: "0.4em",
             cursor: "pointer",
             transition: "all 0.25s",
@@ -149,7 +160,7 @@ export function QuestionScreen({
             border: "none",
             color: "var(--mute)",
             fontFamily: "var(--font-mono)",
-            fontSize: 10,
+            fontSize: skipFs,
             letterSpacing: "0.25em",
             cursor: "pointer",
             textTransform: "uppercase",

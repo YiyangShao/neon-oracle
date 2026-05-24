@@ -3,17 +3,20 @@
 import type { ReactNode } from "react";
 import { INK, cssVars } from "@/lib/theme";
 import { TopChrome } from "@/components/primitives/TopChrome";
+import type { Mode } from "@/lib/useMode";
 
-// The visual container shared by both the live OracleApp and the
-// shared-link viewer: background gradient, film grain, top chrome.
+// Background gradient, film grain, top chrome — shared by OracleApp and ShareViewer.
+// The mode flag bumps the top chrome's font size on desktop.
 export function OracleShell({
   phaseLabel,
   sessionId,
   children,
+  mode = "mobile",
 }: {
   phaseLabel: string;
   sessionId: string;
   children: ReactNode;
+  mode?: Mode;
 }) {
   return (
     <div
@@ -38,7 +41,7 @@ export function OracleShell({
           zIndex: 1,
         }}
       />
-      <TopChrome phase={phaseLabel} accent={INK.accent} sessionId={sessionId} />
+      <TopChrome phase={phaseLabel} accent={INK.accent} sessionId={sessionId} mode={mode} />
       <div style={{ position: "absolute", inset: 0, zIndex: 2 }}>{children}</div>
     </div>
   );

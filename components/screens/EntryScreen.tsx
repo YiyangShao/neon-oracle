@@ -3,20 +3,28 @@
 import { useEffect, useState } from "react";
 import { Starfield } from "@/components/primitives/Starfield";
 import type { Accent } from "@/lib/theme";
+import type { SizeTokens } from "@/lib/useMode";
 
 // 1. Entry — a quiet void. Whole surface taps to begin.
 export function EntryScreen({
   onEnter,
   accent,
+  tokens,
 }: {
   onEnter: () => void;
   accent: Accent;
+  tokens: SizeTokens;
 }) {
   const [hint, setHint] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setHint(true), 1400);
     return () => clearTimeout(t);
   }, []);
+
+  const circle = tokens.entryCircle;
+  const brandFs = tokens.titleSerifMid > 28 ? 18 : 14;
+  const tagline = tokens.titleSerifBig + 6; // a touch above big body
+  const hintFs = tokens.buttonFs - 6;
 
   return (
     <div
@@ -37,12 +45,12 @@ export function EntryScreen({
       <div
         style={{
           fontFamily: "var(--font-serif)",
-          fontSize: 14,
+          fontSize: brandFs,
           letterSpacing: "0.5em",
           color: "var(--bone)",
           opacity: 0.6,
           textAlign: "center",
-          marginBottom: 18,
+          marginBottom: 24,
         }}
       >
         NEON ORACLE
@@ -50,11 +58,11 @@ export function EntryScreen({
 
       <div
         style={{
-          width: 90,
-          height: 90,
+          width: circle,
+          height: circle,
           borderRadius: "50%",
           border: `1px solid ${accent.fg}`,
-          boxShadow: `0 0 28px ${accent.glow}, inset 0 0 18px ${accent.glow}`,
+          boxShadow: `0 0 ${circle * 0.32}px ${accent.glow}, inset 0 0 ${circle * 0.2}px ${accent.glow}`,
           position: "relative",
           animation: "oracle-breath 4.5s ease-in-out infinite",
         }}
@@ -62,7 +70,7 @@ export function EntryScreen({
         <div
           style={{
             position: "absolute",
-            inset: 22,
+            inset: circle * 0.25,
             borderRadius: "50%",
             border: `1px solid ${accent.dim}`,
           }}
@@ -75,9 +83,9 @@ export function EntryScreen({
             alignItems: "center",
             justifyContent: "center",
             fontFamily: "var(--font-serif)",
-            fontSize: 28,
+            fontSize: circle * 0.31,
             color: accent.fg,
-            textShadow: `0 0 14px ${accent.glow}`,
+            textShadow: `0 0 ${circle * 0.16}px ${accent.glow}`,
           }}
         >
           ✶
@@ -86,9 +94,9 @@ export function EntryScreen({
 
       <div
         style={{
-          marginTop: 56,
+          marginTop: 72,
           fontFamily: "var(--font-serif)",
-          fontSize: 22,
+          fontSize: tagline,
           color: "var(--bone)",
           letterSpacing: "0.32em",
           textAlign: "center",
@@ -99,9 +107,9 @@ export function EntryScreen({
 
       <div
         style={{
-          marginTop: 90,
+          marginTop: 110,
           fontFamily: "var(--font-mono)",
-          fontSize: 10,
+          fontSize: hintFs,
           letterSpacing: "0.3em",
           color: "var(--mute)",
           textTransform: "uppercase",

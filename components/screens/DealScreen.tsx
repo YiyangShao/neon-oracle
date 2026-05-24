@@ -7,6 +7,7 @@ import { CardFace } from "@/components/primitives/CardFace";
 import { FlipCard } from "@/components/primitives/FlipCard";
 import type { DrawnCard } from "@/lib/tarot";
 import type { Accent } from "@/lib/theme";
+import type { SizeTokens } from "@/lib/useMode";
 
 type Stage = "dealing" | "ready" | "flipping" | "done";
 
@@ -15,12 +16,14 @@ export function DealScreen({
   cards,
   onFlipped,
   accent,
+  tokens,
   layout = "row",
   flipSpeed = 1,
 }: {
   cards: DrawnCard[];
   onFlipped: () => void;
   accent: Accent;
+  tokens: SizeTokens;
   layout?: "row" | "fan" | "cross";
   flipSpeed?: number;
 }) {
@@ -32,15 +35,17 @@ export function DealScreen({
     return () => clearTimeout(t);
   }, []);
 
-  const cw = 96;
-  const ch = 152;
+  const cw = tokens.cardW;
+  const ch = tokens.cardH;
+  const gap = tokens.cardGap;
 
   const positions = useMemo(() => {
     if (layout === "fan") {
+      const off = cw + gap * 0.4;
       return [
-        { x: -110, y: 10, rot: -12 },
+        { x: -off, y: 10, rot: -12 },
         { x: 0, y: -6, rot: 0 },
-        { x: 110, y: 10, rot: 12 },
+        { x: off, y: 10, rot: 12 },
       ];
     }
     if (layout === "cross") {
@@ -51,11 +56,11 @@ export function DealScreen({
       ];
     }
     return [
-      { x: -(cw + 16), y: 0, rot: 0 },
+      { x: -(cw + gap), y: 0, rot: 0 },
       { x: 0, y: 0, rot: 0 },
-      { x: cw + 16, y: 0, rot: 0 },
+      { x: cw + gap, y: 0, rot: 0 },
     ];
-  }, [layout, ch, cw]);
+  }, [layout, ch, cw, gap]);
 
   const startFlip = () => {
     if (stage !== "ready") return;
@@ -75,6 +80,9 @@ export function DealScreen({
     }, 2400 / flipSpeed);
   };
 
+  const headerFs = tokens.cardW >= 200 ? 12 : 10;
+  const dealLift = Math.max(260, ch * 0.85);
+
   return (
     <div
       style={{
@@ -89,10 +97,10 @@ export function DealScreen({
 
       <div
         style={{
-          marginTop: 56,
+          marginTop: tokens.stagePadTop * 0.9,
           textAlign: "center",
           fontFamily: "var(--font-mono)",
-          fontSize: 10,
+          fontSize: headerFs,
           color: accent.fg,
           letterSpacing: "0.4em",
           textTransform: "uppercase",
@@ -113,7 +121,7 @@ export function DealScreen({
         {cards.map((card, i) => {
           const pos = positions[i];
           const dealing = stage === "dealing";
-          const dealOffset = dealing ? -260 : pos.y;
+          const dealOffset = dealing ? -dealLift : pos.y;
           const dealOpacity = dealing ? 0 : 1;
           return (
             <div
@@ -149,7 +157,7 @@ export function DealScreen({
         })}
       </div>
 
-      <div style={{ textAlign: "center", paddingBottom: 36, minHeight: 80 }}>
+      <div style={{ textAlign: "center", paddingBottom: tokens.stagePadTop * 0.7, minHeight: 80 }}>
         {stage === "ready" && (
           <button
             onClick={startFlip}
@@ -157,9 +165,9 @@ export function DealScreen({
               background: "transparent",
               color: "var(--bone)",
               border: `1px solid ${accent.fg}`,
-              padding: "14px 44px",
+              padding: `${tokens.buttonPadV}px ${tokens.buttonPadH}px`,
               fontFamily: "var(--font-serif)",
-              fontSize: 16,
+              fontSize: tokens.buttonFs,
               letterSpacing: "0.4em",
               cursor: "pointer",
               textIndent: "0.4em",

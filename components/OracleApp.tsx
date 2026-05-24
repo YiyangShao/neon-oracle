@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { drawThree, type DrawnCard } from "@/lib/tarot";
 import { INK } from "@/lib/theme";
 import { compactCards, encodeReading } from "@/lib/share";
+import { useMode, SIZES } from "@/lib/useMode";
 import { OracleShell } from "@/components/OracleShell";
 import { EntryScreen } from "@/components/screens/EntryScreen";
 import { QuestionScreen } from "@/components/screens/QuestionScreen";
@@ -33,21 +34,18 @@ function makeSessionId() {
   return s;
 }
 
-// Top-level state machine. Phases advance linearly; only "share" can rewind to "entry".
-// generateOracle fires in parallel with the casting/deal animation so the text
-// is usually ready by the time the user finishes flipping cards.
 export function OracleApp() {
   const [phase, setPhase] = useState<Phase>("entry");
   const [question, setQuestion] = useState("");
   const [cards, setCards] = useState<DrawnCard[]>([]);
   const [oracle, setOracle] = useState<OracleResult | null>(null);
-  // sessionId is random — must be generated after hydration to avoid a
-  // server/client mismatch. Empty on SSR; populated on the first client tick.
   const [sessionId, setSessionId] = useState("");
   useEffect(() => {
     setSessionId(makeSessionId());
   }, []);
 
+  const mode = useMode();
+  const tokens = SIZES[mode];
   const accent = INK.accent;
 
   const handleQuestion = useCallback(async (q: string) => {
@@ -94,8 +92,6 @@ export function OracleApp() {
     setOracle(null);
   }, []);
 
-  // Build the share URL when we're on the share phase and have everything.
-  // Computed client-side because it uses window.location.
   const shareUrl = useMemo(() => {
     if (phase !== "share" || !oracle || !sessionId) return undefined;
     if (typeof window === "undefined") return undefined;
@@ -110,18 +106,18 @@ export function OracleApp() {
   }, [phase, oracle, sessionId, question, cards]);
 
   return (
-    <OracleShell phaseLabel={PHASE_LABEL[phase]} sessionId={sessionId}>
+    <OracleShell phaseLabel={PHASE_LABEL[phase]} sessionId={sessionId} mode={mode}>
       {phase === "entry" && (
-        <EntryScreen onEnter={() => setPhase("question")} accent={accent} />
+        <EntryScreen onEnter={() => setPhase("question")} accent={accent} tokens={tokens} />
       )}
       {phase === "question" && (
-        <QuestionScreen onCommit={handleQuestion} accent={accent} />
+        <QuestionScreen onCommit={handleQuestion} accent={accent} tokens={tokens} />
       )}
       {phase === "casting" && (
         <CastingScreen onDone={handleCastingDone} accent={accent} />
       )}
       {phase === "deal" && (
-        <DealScreen cards={cards} onFlipped={handleFlipped} accent={accent} />
+        <DealScreen cards={cards} onFlipped={handleFlipped} accent={accent} tokens={tokens} />
       )}
       {phase === "oracle" &&
         (oracle ? (
@@ -131,6 +127,7 @@ export function OracleApp() {
             question={question}
             live={oracle.live}
             accent={accent}
+            tokens={tokens}
             onContinue={() => setPhase("share")}
           />
         ) : (
@@ -144,6 +141,7 @@ export function OracleApp() {
           sessionId={sessionId}
           onAgain={handleAgain}
           accent={accent}
+          tokens={tokens}
           shareUrl={shareUrl}
         />
       )}

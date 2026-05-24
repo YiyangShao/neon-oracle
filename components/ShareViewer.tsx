@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { INK } from "@/lib/theme";
+import { useMode, SIZES } from "@/lib/useMode";
 import { OracleShell } from "@/components/OracleShell";
 import { ShareScreen } from "@/components/screens/ShareScreen";
 import { expandCards, type SharePayload } from "@/lib/share";
@@ -11,8 +12,10 @@ import { expandCards, type SharePayload } from "@/lib/share";
 export function ShareViewer({ payload }: { payload: SharePayload }) {
   const router = useRouter();
   const cards = expandCards(payload.c);
+  const mode = useMode();
+  const tokens = SIZES[mode];
   return (
-    <OracleShell phaseLabel="fin." sessionId={payload.sid}>
+    <OracleShell phaseLabel="fin." sessionId={payload.sid} mode={mode}>
       <ShareScreen
         cards={cards}
         sections={payload.s}
@@ -20,6 +23,7 @@ export function ShareViewer({ payload }: { payload: SharePayload }) {
         sessionId={payload.sid}
         onAgain={() => router.push("/")}
         accent={INK.accent}
+        tokens={tokens}
         viewer
       />
     </OracleShell>
